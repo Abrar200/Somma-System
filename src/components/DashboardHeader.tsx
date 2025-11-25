@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { LogOut, User } from 'lucide-react';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
+import { useNavigate } from 'react-router-dom';
 
 interface DashboardHeaderProps {
   onLogout: () => void;
@@ -8,19 +10,33 @@ interface DashboardHeaderProps {
 }
 
 export const DashboardHeader = ({ onLogout, user }: DashboardHeaderProps) => {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      if (onLogout) {
+        onLogout();
+      }
+      navigate('/login'); // Redirect to login page
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   return (
     <header className="bg-white shadow-sm border-b" style={{ borderColor: '#E1D9CD' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-4">
             <img
-              src="https://d64gsuwffb70l.cloudfront.net/685afce20bfda24fc0f1d36c_1753796540506_1ce0d419.png"
-              alt="Ammos Greek Bistro"
+              src="/somma.png"
+              alt="Somma Greek Restaurant"
               className="h-10 w-auto"
             />
             <div className="h-8 w-px bg-gray-300"></div>
             <h1 className="text-2xl font-bold" style={{ color: '#102E47' }}>
-              Admin Panel
+              Somma Admin Panel
             </h1>
           </div>
           <div className="flex items-center space-x-4">
@@ -31,7 +47,7 @@ export const DashboardHeader = ({ onLogout, user }: DashboardHeaderProps) => {
             <Button
               variant="outline"
               size="sm"
-              onClick={onLogout}
+              onClick={handleLogout} // Use the new handleLogout function
               className="flex items-center space-x-2"
               style={{
                 borderColor: '#102E47',

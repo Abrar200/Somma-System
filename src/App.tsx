@@ -2,10 +2,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
+import LoginPage from "./components/pages/LoginPage";
 import StaffProfile from "./pages/StaffProfile";
 import NotFound from "./pages/NotFound";
 import { ResetPasswordPage } from "./pages/ResetPassword";
@@ -30,6 +31,24 @@ import SubscriptionsPage from "./components/pages/SubscriptionsPage";
 
 const queryClient = new QueryClient();
 
+// Protected Route component
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#102E47] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  return user ? <>{children}</> : <Navigate to="/login" replace />;
+}
+
 const App = () => (
   <ThemeProvider defaultTheme="light">
     <QueryClientProvider client={queryClient}>
@@ -39,12 +58,16 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<LoginPage />} />
               <Route path="/staff/:id" element={<StaffProfile />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               
-              {/* Dashboard Routes */}
-              <Route path="/" element={<DashboardLayout />}>
+              {/* Protected Dashboard Routes */}
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <DashboardLayout />
+                </ProtectedRoute>
+              }>
                 <Route index element={<OverviewPage />} />
                 <Route path="takings" element={<TakingsPage />} />
                 <Route path="ordering" element={<OrderingPage />} />

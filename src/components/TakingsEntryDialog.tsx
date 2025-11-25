@@ -74,12 +74,18 @@ export default function TakingsEntryDialog({ open, onOpenChange, editingTaking, 
         throw new Error('All amounts must be positive numbers');
       }
 
+      
+      const grossTakings = calculateGross();
+      const cashToBank = calculateCashToBank();
+
       const takingData = {
         entry_date: formData.entry_date,
         pos_amount: formData.pos_amount,
         eft_amount: formData.eft_amount,
         cash_amount: formData.cash_amount,
         cash_float: CASH_FLOAT,
+        gross_takings: grossTakings, // ADD THIS
+        cash_to_bank: cashToBank,    // ADD THIS
         notes: formData.notes || null,
         updated_at: new Date().toISOString()
       };

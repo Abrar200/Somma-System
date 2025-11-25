@@ -60,18 +60,18 @@ export default function TakingsPage() {
     const headers = ['Date', 'POS', 'EFT', 'Cash', 'Gross Takings', 'Cash to Bank', 'Notes'];
     const csvData = takings.map(taking => [
       taking.entry_date,
-      taking.pos_amount.toFixed(2),
-      taking.eft_amount.toFixed(2),
-      taking.cash_amount.toFixed(2),
-      taking.gross_takings.toFixed(2),
-      taking.cash_to_bank.toFixed(2),
+      (taking.pos_amount || 0).toFixed(2),  // Fixed: null check
+      (taking.eft_amount || 0).toFixed(2),  // Fixed: null check
+      (taking.cash_amount || 0).toFixed(2), // Fixed: null check
+      (taking.gross_takings || 0).toFixed(2), // Fixed: null check
+      (taking.cash_to_bank || 0).toFixed(2), // Fixed: null check
       taking.notes || ''
     ]);
-
+  
     const csvContent = [headers, ...csvData]
       .map(row => row.map(field => `"${field}"`).join(','))
       .join('\n');
-
+  
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -81,7 +81,7 @@ export default function TakingsPage() {
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
-
+  
     toast({
       title: "Success",
       description: "Takings exported to CSV",
@@ -167,14 +167,14 @@ export default function TakingsPage() {
                         {format(new Date(taking.entry_date), 'MMM dd, yyyy')}
                       </div>
                     </TableCell>
-                    <TableCell>${taking.pos_amount.toFixed(2)}</TableCell>
-                    <TableCell>${taking.eft_amount.toFixed(2)}</TableCell>
-                    <TableCell>${taking.cash_amount.toFixed(2)}</TableCell>
+                    <TableCell>${(taking.pos_amount || 0).toFixed(2)}</TableCell>
+                    <TableCell>${(taking.eft_amount || 0).toFixed(2)}</TableCell>
+                    <TableCell>${(taking.cash_amount || 0).toFixed(2)}</TableCell>
                     <TableCell className="font-semibold">
-                      ${taking.gross_takings.toFixed(2)}
+                      ${(taking.gross_takings || 0).toFixed(2)}
                     </TableCell>
                     <TableCell className={taking.cash_to_bank >= 0 ? 'text-green-600' : 'text-red-600'}>
-                      ${taking.cash_to_bank.toFixed(2)}
+                      ${(taking.cash_to_bank || 0).toFixed(2)}
                     </TableCell>
                     <TableCell>
                       <Badge 
